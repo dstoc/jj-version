@@ -2,9 +2,11 @@
 name = "jj-version-macro"
 version = "0.1.0"
 edition = "2024"
-description = "Proc macro stub for jj-version"
+description = "Proc macro for jj-version"
 
 [lib]
 proc-macro = true
 
 [dependencies]
+proc-macro2 = "1"
+syn = { version = "2", features = ["full"] }
