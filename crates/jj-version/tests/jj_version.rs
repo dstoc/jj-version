@@ -154,7 +154,7 @@ jj-version = {{ path = "{}" }}
 
     let main_rs = format!(
         r#"fn main() {{
-    println!("{{}}", jj_version::version!(fallback = {fallback_expr}));
+    println!("{{}}", jj_version::jj_version!(fallback = {fallback_expr}));
 }}
 "#
     );
@@ -404,7 +404,7 @@ fn syntax_errors_are_reported() {
     write_file(
         &crate_dir.join("src/main.rs"),
         r#"fn main() {
-    let _ = jj_version::version!(fallback = );
+    let _ = jj_version::jj_version!(fallback = );
 }
 "#,
     );

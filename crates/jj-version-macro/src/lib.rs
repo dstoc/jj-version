@@ -12,7 +12,7 @@ const JJ_BASE_ARGS: [&str; 4] = [
 ];
 
 #[proc_macro]
-pub fn version(input: TokenStream) -> TokenStream {
+pub fn jj_version(input: TokenStream) -> TokenStream {
     let parsed = match syn::parse::<VersionArgs>(input.clone()) {
         Ok(args) => args,
         Err(err) => return compile_error(err.to_string()),

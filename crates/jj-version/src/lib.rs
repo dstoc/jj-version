@@ -1,1 +1,1 @@
-pub use jj_version_macro::version;
+pub use jj_version_macro::jj_version;
