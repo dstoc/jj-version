@@ -1,0 +1,10 @@
+[package]
+name = "jj-version-macro"
+version = "0.1.0"
+edition = "2024"
+description = "Proc macro stub for jj-version"
+
+[lib]
+proc-macro = true
+
+[dependencies]

@@ -1,6 +1,6 @@
-[package]
-name = "jj-version"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
+[workspace]
+members = [
+    "crates/jj-version",
+    "crates/jj-version-macro",
+]
+resolver = "3"
