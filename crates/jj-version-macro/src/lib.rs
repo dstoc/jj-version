@@ -11,6 +11,47 @@ const JJ_BASE_ARGS: [&str; 4] = [
     "--color=never",
 ];
 
+/// Embed a Jujutsu-derived version string at compile time.
+///
+/// The following named argument is required:
+///
+/// - `fallback`:
+///   A Rust expression to emit if `jj` is unavailable, the current directory is
+///   not a Jujutsu repository, or version resolution fails. The expression must
+///   evaluate to `&'static str` in the calling context.
+///
+/// If Jujutsu metadata is available, the macro expands to a string literal
+/// similar to `git describe --tags --always`, for example `v1.2.3`,
+/// `v1.2.3-4-gabc123def456`, or `abc123def456`.
+///
+/// The macro invokes the `jj` binary directly with `--ignore-working-copy` and
+/// never snapshots or mutates the repository. It does not emit a dirty suffix.
+///
+/// # Examples
+///
+/// ```ignore
+/// # use jj_version::jj_version;
+/// const VERSION: &str = jj_version!(
+///     fallback = env!("CARGO_PKG_VERSION"),
+/// );
+/// ```
+///
+/// ```ignore
+/// # use jj_version::jj_version;
+/// const VERSION: &str = jj_version!(
+///     fallback = concat!("fallback-", env!("CARGO_PKG_VERSION")),
+/// );
+/// ```
+///
+/// ```ignore
+/// # use jj_version::jj_version;
+/// const VERSION: &str = jj_version!(
+///     fallback = git_version::git_version!(
+///         args = ["--tags", "--dirty", "--always", "--abbrev=12"],
+///         fallback = env!("CARGO_PKG_VERSION"),
+///     ),
+/// );
+/// ```
 #[proc_macro]
 pub fn jj_version(input: TokenStream) -> TokenStream {
     let parsed = match syn::parse::<VersionArgs>(input.clone()) {
