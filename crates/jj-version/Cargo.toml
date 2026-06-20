@@ -5,6 +5,7 @@ edition = "2024"
 description = "Compile-time version strings from Jujutsu metadata"
 license = "MIT"
 readme = "../../README.md"
+repository = "https://github.com/dstoc/jj-version"
 
 [dependencies]
 jj-version-macro = { version = "0.1.1", path = "../jj-version-macro" }
