@@ -4,7 +4,7 @@ version = "0.1.1"
 edition = "2024"
 description = "Proc macro for jj-version"
 license = "MIT"
-readme = "../../README.md"
+readme = "README.md"
 repository = "https://github.com/dstoc/jj-version"
 
 [lib]
