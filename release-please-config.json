@@ -15,7 +15,8 @@
     },
     "crates/jj-version-macro": {
       "release-type": "rust",
-      "package-name": "jj-version-macro"
+      "package-name": "jj-version-macro",
+      "skip-github-release": true
     }
   }
 }

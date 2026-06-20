@@ -16,7 +16,6 @@ jobs:
       jj_version_tag_name: ${{ steps.release.outputs['crates/jj-version--tag_name'] }}
       jj_version_version: ${{ steps.release.outputs['crates/jj-version--version'] }}
       macro_release_created: ${{ steps.release.outputs['crates/jj-version-macro--release_created'] }}
-      macro_tag_name: ${{ steps.release.outputs['crates/jj-version-macro--tag_name'] }}
       macro_version: ${{ steps.release.outputs['crates/jj-version-macro--version'] }}
     steps:
       - uses: googleapis/release-please-action@v4
@@ -37,7 +36,6 @@ jobs:
       JJ_VERSION_TAG_NAME: ${{ needs.release-please.outputs.jj_version_tag_name }}
       JJ_VERSION_VERSION: ${{ needs.release-please.outputs.jj_version_version }}
       MACRO_RELEASE_CREATED: ${{ needs.release-please.outputs.macro_release_created }}
-      MACRO_TAG_NAME: ${{ needs.release-please.outputs.macro_tag_name }}
       MACRO_VERSION: ${{ needs.release-please.outputs.macro_version }}
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +81,11 @@ jobs:
             return 1
           }
 
-          if [ "$MACRO_RELEASE_CREATED" = "true" ]; then
+          if [ "$MACRO_RELEASE_CREATED" = "true" ] || [ "$JJ_VERSION_RELEASE_CREATED" = "true" ]; then
+            if [ -z "$MACRO_VERSION" ]; then
+              MACRO_VERSION="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "jj-version-macro") | .version')"
+            fi
+
             publish_crate jj-version-macro "$MACRO_VERSION" 3
           fi
 
@@ -91,14 +93,10 @@ jobs:
             publish_crate jj-version "$JJ_VERSION_VERSION" 10
           fi
 
-      - name: Publish GitHub release
+      - name: Publish jj-version GitHub release
         shell: bash
         run: |
           set -euo pipefail
-
-          if [ "$MACRO_RELEASE_CREATED" = "true" ]; then
-            gh release edit "$MACRO_TAG_NAME" --draft=false
-          fi
 
           if [ "$JJ_VERSION_RELEASE_CREATED" = "true" ]; then
             gh release edit "$JJ_VERSION_TAG_NAME" --draft=false
