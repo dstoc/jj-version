@@ -1,3 +1,4 @@
 {
-  ".": "0.1.0"
+  "crates/jj-version": "0.1.0",
+  "crates/jj-version-macro": "0.1.0"
 }

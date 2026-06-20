@@ -9,9 +9,13 @@
     }
   ],
   "packages": {
-    ".": {
+    "crates/jj-version": {
       "release-type": "rust",
       "package-name": "jj-version"
+    },
+    "crates/jj-version-macro": {
+      "release-type": "rust",
+      "package-name": "jj-version-macro"
     }
   }
 }

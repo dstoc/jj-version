@@ -12,9 +12,12 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      version: ${{ steps.release.outputs.version }}
+      jj_version_release_created: ${{ steps.release.outputs['crates/jj-version--release_created'] }}
+      jj_version_tag_name: ${{ steps.release.outputs['crates/jj-version--tag_name'] }}
+      jj_version_version: ${{ steps.release.outputs['crates/jj-version--version'] }}
+      macro_release_created: ${{ steps.release.outputs['crates/jj-version-macro--release_created'] }}
+      macro_tag_name: ${{ steps.release.outputs['crates/jj-version-macro--tag_name'] }}
+      macro_version: ${{ steps.release.outputs['crates/jj-version-macro--version'] }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -23,15 +26,19 @@ jobs:
 
   publish-crates:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.jj_version_release_created == 'true' || needs.release-please.outputs.macro_release_created == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
       CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      VERSION: ${{ needs.release-please.outputs.version }}
-      TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+      JJ_VERSION_RELEASE_CREATED: ${{ needs.release-please.outputs.jj_version_release_created }}
+      JJ_VERSION_TAG_NAME: ${{ needs.release-please.outputs.jj_version_tag_name }}
+      JJ_VERSION_VERSION: ${{ needs.release-please.outputs.jj_version_version }}
+      MACRO_RELEASE_CREATED: ${{ needs.release-please.outputs.macro_release_created }}
+      MACRO_TAG_NAME: ${{ needs.release-please.outputs.macro_tag_name }}
+      MACRO_VERSION: ${{ needs.release-please.outputs.macro_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -44,38 +51,55 @@ jobs:
 
           crate_is_published() {
             local crate="$1"
-            cargo search "$crate" --limit 1 | grep -E "^${crate} = \"${VERSION}\""
+            local version="$2"
+            cargo search "$crate" --limit 1 | grep -E "^${crate} = \"${version}\""
           }
 
           publish_crate() {
             local crate="$1"
-            local attempts="$2"
+            local version="$2"
+            local attempts="$3"
 
-            if crate_is_published "$crate"; then
-              echo "$crate $VERSION is already published"
+            if crate_is_published "$crate" "$version"; then
+              echo "$crate $version is already published"
               return 0
             fi
 
             for attempt in $(seq 1 "$attempts"); do
-              echo "Publishing $crate $VERSION (attempt $attempt/$attempts)"
+              echo "Publishing $crate $version (attempt $attempt/$attempts)"
               if cargo publish -p "$crate" --locked; then
                 return 0
               fi
 
-              if crate_is_published "$crate"; then
-                echo "$crate $VERSION became visible on crates.io"
+              if crate_is_published "$crate" "$version"; then
+                echo "$crate $version became visible on crates.io"
                 return 0
               fi
 
               sleep 30
             done
 
-            echo "Failed to publish $crate $VERSION" >&2
+            echo "Failed to publish $crate $version" >&2
             return 1
           }
 
-          publish_crate jj-version-macro 3
-          publish_crate jj-version 10
+          if [ "$MACRO_RELEASE_CREATED" = "true" ]; then
+            publish_crate jj-version-macro "$MACRO_VERSION" 3
+          fi
+
+          if [ "$JJ_VERSION_RELEASE_CREATED" = "true" ]; then
+            publish_crate jj-version "$JJ_VERSION_VERSION" 10
+          fi
 
       - name: Publish GitHub release
-        run: gh release edit "$TAG_NAME" --draft=false
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$MACRO_RELEASE_CREATED" = "true" ]; then
+            gh release edit "$MACRO_TAG_NAME" --draft=false
+          fi
+
+          if [ "$JJ_VERSION_RELEASE_CREATED" = "true" ]; then
+            gh release edit "$JJ_VERSION_TAG_NAME" --draft=false
+          fi
