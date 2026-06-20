@@ -7,7 +7,7 @@ license = "MIT"
 readme = "../../README.md"
 
 [dependencies]
-jj-version-macro = { path = "../jj-version-macro" }
+jj-version-macro = { version = "0.1.0", path = "../jj-version-macro" }
 
 [dev-dependencies]
 tempfile = "3"

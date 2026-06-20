@@ -93,7 +93,7 @@ impl Parse for VersionArgs {
             fallback_tokens.pop();
         }
 
-        let fallback = TokenStream2::from_iter(fallback_tokens.into_iter());
+        let fallback = TokenStream2::from_iter(fallback_tokens);
         syn::parse2::<Expr>(fallback.clone())
             .map_err(|err| syn::Error::new(err.span(), "expected `fallback = <expr>`"))?;
 
