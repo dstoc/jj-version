@@ -3,6 +3,7 @@ name = "jj-version-macro"
 version = "0.1.0"
 edition = "2024"
 description = "Proc macro for jj-version"
+license = "MIT"
 
 [lib]
 proc-macro = true
