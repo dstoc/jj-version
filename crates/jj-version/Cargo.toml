@@ -1,13 +1,13 @@
 [package]
 name = "jj-version"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "Compile-time version strings from Jujutsu metadata"
 license = "MIT"
 readme = "../../README.md"
 
 [dependencies]
-jj-version-macro = { version = "0.1.1", path = "../jj-version-macro" }
+jj-version-macro = { version = "0.1.2", path = "../jj-version-macro" }
 
 [dev-dependencies]
 tempfile = "3"
