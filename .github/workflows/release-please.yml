@@ -99,5 +99,16 @@ jobs:
           set -euo pipefail
 
           if [ "$JJ_VERSION_RELEASE_CREATED" = "true" ]; then
+            crates_url="https://crates.io/crates/jj-version/${JJ_VERSION_VERSION}"
+            notes_file="$(mktemp)"
+
+            gh release view "$JJ_VERSION_TAG_NAME" --json body --jq .body > "$notes_file"
+            sed -i '/^## crates.io$/,/^## /{ /^## /!d; /^## crates.io$/d; }' "$notes_file"
+            {
+              printf '\n## crates.io\n\n'
+              printf '%s\n' "$crates_url"
+            } >> "$notes_file"
+
+            gh release edit "$JJ_VERSION_TAG_NAME" --notes-file "$notes_file"
             gh release edit "$JJ_VERSION_TAG_NAME" --draft=false
           fi
