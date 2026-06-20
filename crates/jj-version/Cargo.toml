@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 jj-version-macro = { path = "../jj-version-macro" }
+
+[dev-dependencies]
+tempfile = "3"

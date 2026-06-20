@@ -95,7 +95,7 @@ fn resolve_jj_version() -> Option<String> {
     };
 
     let count_revset = format!("({tag_revset})..({effective_rev})");
-    let count = run_jj_single_line(&["log", "-G", "--count", "-r", &count_revset])?
+    let count = run_jj_single_line(&["log", "--count", "-r", &count_revset])?
         .parse::<usize>()
         .ok()?;
 
